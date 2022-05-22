@@ -1,0 +1,23 @@
+name: store
+description: Application state management.
+version: 1.0.0
+
+publish_to: 'none'
+
+environment:
+  sdk: '>=2.16.0 <3.0.0'
+
+dependencies:
+  domain:
+    path: ../domain
+  flutter:
+    sdk: flutter
+  injector:
+    path: ../injector
+  provider:
+  repositories:
+    path: ../repositories
+
+dev_dependencies:
+  lints: ^1.0.0
+  test: ^1.16.0

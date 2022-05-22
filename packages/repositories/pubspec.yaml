@@ -1,0 +1,24 @@
+name: repositories
+description: Application repositories
+version: 1.0.0
+
+publish_to: 'none'
+
+environment:
+  sdk: '>=2.16.0 <3.0.0'
+
+dependencies:
+  domain:
+    path: ../domain
+  infrastructure:
+    path: ../infrastructure
+  mapper:
+    path: ../mapper
+  source:
+    path: ../source
+  storage:
+    path: ../storage
+
+dev_dependencies:
+  lints: ^1.0.0
+  test: ^1.16.0
