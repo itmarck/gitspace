@@ -54,6 +54,10 @@ class Gitspace extends StatelessWidget {
           bodySmall: TextStyle(color: Colors.white24),
           headlineLarge: TextStyle(fontWeight: FontWeight.bold),
         ),
+        bottomSheetTheme: const BottomSheetThemeData(
+          surfaceTintColor: Colors.transparent,
+          modalBackgroundColor: Color(0xFF212429),
+        ),
         filledButtonTheme: FilledButtonThemeData(
           style: ButtonStyle(
             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -81,22 +85,19 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  Account? account;
   List<Account> accounts = [
     Account(email: 'me@example.com', name: 'Gitlab', token: 'token'),
     Account(email: 'marcelo@gmail.com', name: 'Github', token: 'token'),
   ];
 
-  void _onAccountChanged(Account account) {
-    setState(() {
-      accounts.add(account);
-    });
+  void _addAccount(Account account) {
+    setState(() => accounts.add(account));
   }
 
   @override
   Widget build(BuildContext context) {
     if (accounts.isEmpty) {
-      return AddAccountPage(onChange: _onAccountChanged);
+      return AddAccountPage(onChange: _addAccount);
     }
 
     return Column(
@@ -106,7 +107,7 @@ class _HomeState extends State<Home> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32.0),
           child: Text(
-            'My accounts',
+            Strings.accountsPageTitle,
             style: Theme.of(context).textTheme.headlineLarge,
           ),
         ),
@@ -123,9 +124,11 @@ class _HomeState extends State<Home> {
                   ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                  child: Text(
-                    'Long press the account to remove it',
-                    style: Theme.of(context).textTheme.bodySmall,
+                  child: Center(
+                    child: Text(
+                      Strings.removeAccountHint,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
                   ),
                 ),
               ],
@@ -133,11 +136,35 @@ class _HomeState extends State<Home> {
           ),
         ),
         const SizedBox(height: 32.0),
-        const Column(
-          children: [
-            Text(Strings.addAccountHint),
-            Icon(Icons.keyboard_arrow_up_rounded, size: 48.0),
-          ],
+        GestureDetector(
+          onVerticalDragEnd: (details) {
+            if (details.velocity.pixelsPerSecond.dy < 0) {
+              showModalBottomSheet(
+                isScrollControlled: true,
+                context: context,
+                builder: (context) {
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    child: AddAccountPage(onChange: (Account account) {
+                      _addAccount(account);
+                      Navigator.pop(context);
+                    }),
+                  );
+                },
+              );
+            }
+          },
+          child: const Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Text(Strings.addAccountHint),
+              ),
+              Icon(Icons.keyboard_arrow_up_rounded, size: 48.0),
+            ],
+          ),
         ),
         const SizedBox(height: 32.0),
       ],
@@ -164,7 +191,7 @@ class AccountCard extends StatelessWidget {
             Icons.person,
             size: 32.0,
           ),
-          const SizedBox(width: 24.0),
+          const SizedBox(width: 16.0),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -197,6 +224,7 @@ class _AddAccountPageState extends State<AddAccountPage> {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
       children: [
         const SizedBox(height: 64.0),
         Padding(
@@ -248,7 +276,8 @@ class _AddAccountPageState extends State<AddAccountPage> {
             },
             child: const Text(Strings.signIn),
           ),
-        )
+        ),
+        const SizedBox(height: 32.0),
       ],
     );
   }
