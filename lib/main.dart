@@ -5,14 +5,18 @@ import 'package:gitspace/account.dart';
 import 'package:gitspace/strings.dart';
 import 'package:http/http.dart';
 
-Future<String> fetchEmail(token) async {
+Future<Account> fetchAccount(token) async {
   final uri = Uri.parse('https://api.github.com/user/public_emails');
   final response = await get(uri, headers: {'Authorization': 'Bearer $token'});
 
   if (response.statusCode == 200) {
     final emails = jsonDecode(response.body) as List;
     final primaryEmail = emails.firstWhere((item) => item['primary'] == true);
-    return primaryEmail['email'];
+    return Account(
+      name: 'Github',
+      email: primaryEmail['email'],
+      token: token,
+    );
   } else {
     throw Exception('Failed to fetch email');
   }
@@ -47,6 +51,7 @@ class Gitspace extends StatelessWidget {
           brightness: Brightness.dark,
         ),
         textTheme: const TextTheme(
+          bodySmall: TextStyle(color: Colors.white24),
           headlineLarge: TextStyle(fontWeight: FontWeight.bold),
         ),
         filledButtonTheme: FilledButtonThemeData(
@@ -77,16 +82,20 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   Account? account;
+  List<Account> accounts = [
+    Account(email: 'me@example.com', name: 'Gitlab', token: 'token'),
+    Account(email: 'marcelo@gmail.com', name: 'Github', token: 'token'),
+  ];
 
   void _onAccountChanged(Account account) {
     setState(() {
-      this.account = account;
+      accounts.add(account);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (account == null) {
+    if (accounts.isEmpty) {
       return AddAccountPage(onChange: _onAccountChanged);
     }
 
@@ -102,10 +111,35 @@ class _HomeState extends State<Home> {
           ),
         ),
         const SizedBox(height: 32.0),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32.0),
-          child: AccountCard(account: account!),
-        )
+        Expanded(
+          child: SingleChildScrollView(
+            child: Wrap(
+              runSpacing: 16.0,
+              children: [
+                for (var account in accounts)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                    child: AccountCard(account: account),
+                  ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                  child: Text(
+                    'Long press the account to remove it',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 32.0),
+        const Column(
+          children: [
+            Text(Strings.addAccountHint),
+            Icon(Icons.keyboard_arrow_up_rounded, size: 48.0),
+          ],
+        ),
+        const SizedBox(height: 32.0),
       ],
     );
   }
@@ -125,7 +159,6 @@ class AccountCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.max,
         children: [
           const Icon(
             Icons.person,
@@ -209,8 +242,8 @@ class _AddAccountPageState extends State<AddAccountPage> {
           padding: const EdgeInsets.symmetric(horizontal: 32.0),
           child: FilledButton(
             onPressed: () {
-              fetchEmail(_textController.text).then((String email) {
-                widget.onChange(Account(name: 'Github', email: email));
+              fetchAccount(_textController.text).then((Account account) {
+                widget.onChange(account);
               });
             },
             child: const Text(Strings.signIn),
