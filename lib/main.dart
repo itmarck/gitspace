@@ -86,10 +86,24 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  /// List of all accounts in the user device.
   List<Account> accounts = [
     Account(email: 'me@example.com', name: 'Gitlab', token: 'token'),
     Account(email: 'marcelo@gmail.com', name: 'Github', token: 'token'),
   ];
+
+  /// Currently active account. There should be always an active account.
+  Account? activeAccount;
+
+  @override
+  void initState() {
+    super.initState();
+    activeAccount = accounts.firstOrNull;
+  }
+
+  void _selectAccount(Account account) {
+    setState(() => activeAccount = account);
+  }
 
   void _addAccount(Account account) {
     setState(() => accounts.add(account));
@@ -127,7 +141,9 @@ class _HomeState extends State<Home> {
                     padding: const EdgeInsets.symmetric(horizontal: 32.0),
                     child: AccountCard(
                       account: account,
+                      onTap: _selectAccount,
                       onLongPress: _removeAccount,
+                      selected: identical(account, activeAccount),
                     ),
                   ),
                 Padding(
@@ -218,18 +234,27 @@ class Confirmation extends StatelessWidget {
 
 class AccountCard extends StatelessWidget {
   final Account account;
+  final void Function(Account) onTap;
   final void Function(Account) onLongPress;
+  final bool selected;
 
   const AccountCard({
     super.key,
     required this.account,
+    required this.onTap,
     required this.onLongPress,
+    this.selected = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      onTap: () {
+        onTap(account);
+      },
       onLongPress: () {
+        if (selected) return;
+
         showDialog(
           context: context,
           builder: (context) {
@@ -248,7 +273,7 @@ class AccountCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
+          color: selected ? Theme.of(context).colorScheme.surface : null,
           borderRadius: BorderRadius.circular(8.0),
         ),
         child: Row(
