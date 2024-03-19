@@ -37,26 +37,27 @@ class Gitspace extends StatelessWidget {
       darkTheme: ThemeData(
         useMaterial3: true,
         hintColor: Colors.white24,
-        inputDecorationTheme: const InputDecorationTheme(
-          hintStyle: TextStyle(
-            color: Colors.white24,
-            fontWeight: FontWeight.normal,
-          ),
-        ),
         colorScheme: const ColorScheme.dark(
+          brightness: Brightness.dark,
           primary: Color(0xFFC73966),
           onPrimary: Colors.white,
           background: Color(0xFF212429),
-          surface: Color(0xFF26292E),
-          brightness: Brightness.dark,
+          onBackground: Colors.white,
+          surface: Color(0xFF1C1E22),
+          surfaceTint: Colors.transparent,
         ),
         textTheme: const TextTheme(
           bodySmall: TextStyle(color: Colors.white24),
           headlineLarge: TextStyle(fontWeight: FontWeight.bold),
         ),
         bottomSheetTheme: const BottomSheetThemeData(
-          surfaceTintColor: Colors.transparent,
-          modalBackgroundColor: Color(0xFF212429),
+          backgroundColor: Color(0xFF212429),
+        ),
+        inputDecorationTheme: const InputDecorationTheme(
+          hintStyle: TextStyle(
+            color: Colors.white24,
+            fontWeight: FontWeight.normal,
+          ),
         ),
         filledButtonTheme: FilledButtonThemeData(
           style: ButtonStyle(
@@ -94,6 +95,10 @@ class _HomeState extends State<Home> {
     setState(() => accounts.add(account));
   }
 
+  void _removeAccount(Account account) {
+    setState(() => accounts.remove(account));
+  }
+
   @override
   Widget build(BuildContext context) {
     if (accounts.isEmpty) {
@@ -120,7 +125,10 @@ class _HomeState extends State<Home> {
                 for (var account in accounts)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                    child: AccountCard(account: account),
+                    child: AccountCard(
+                      account: account,
+                      onLongPress: _removeAccount,
+                    ),
                   ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 32.0),
@@ -137,6 +145,7 @@ class _HomeState extends State<Home> {
         ),
         const SizedBox(height: 32.0),
         GestureDetector(
+          behavior: HitTestBehavior.translucent,
           onVerticalDragEnd: (details) {
             if (details.velocity.pixelsPerSecond.dy < 0) {
               showModalBottomSheet(
@@ -156,14 +165,14 @@ class _HomeState extends State<Home> {
               );
             }
           },
-          child: const Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Center(
-                child: Text(Strings.addAccountHint),
-              ),
-              Icon(Icons.keyboard_arrow_up_rounded, size: 48.0),
-            ],
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 32.0),
+            child: const Column(
+              children: [
+                Text(Strings.addAccountHint),
+                Icon(Icons.keyboard_arrow_up_rounded, size: 48.0),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 32.0),
@@ -172,37 +181,95 @@ class _HomeState extends State<Home> {
   }
 }
 
-class AccountCard extends StatelessWidget {
-  final Account account;
+class Confirmation extends StatelessWidget {
+  final String title;
+  final String description;
+  final String okText;
+  final String cancelText;
+  final void Function()? onOk;
 
-  const AccountCard({super.key, required this.account});
+  const Confirmation({
+    super.key,
+    required this.title,
+    required this.description,
+    required this.okText,
+    this.onOk,
+    cancelText,
+  }) : cancelText = cancelText ?? 'Cancel';
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(8.0),
-      ),
-      child: Row(
-        children: [
-          const Icon(
-            Icons.person,
-            size: 32.0,
-          ),
-          const SizedBox(width: 16.0),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(account.email),
-              Text(
-                account.name,
-                style: TextStyle(color: Theme.of(context).hintColor),
-              ),
-            ],
-          ),
-        ],
+    return AlertDialog(
+      title: Text(title),
+      content: Text(description),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(cancelText),
+        ),
+        TextButton(
+          onPressed: onOk,
+          child: Text(okText),
+        )
+      ],
+    );
+  }
+}
+
+class AccountCard extends StatelessWidget {
+  final Account account;
+  final void Function(Account) onLongPress;
+
+  const AccountCard({
+    super.key,
+    required this.account,
+    required this.onLongPress,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onLongPress: () {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return Confirmation(
+              title: 'Are you sure?',
+              description: 'This action cannot be undone',
+              okText: 'Yes',
+              onOk: () {
+                onLongPress(account);
+                Navigator.pop(context);
+              },
+            );
+          },
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.person,
+              size: 32.0,
+            ),
+            const SizedBox(width: 16.0),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(account.email),
+                Text(
+                  account.name,
+                  style: TextStyle(color: Theme.of(context).hintColor),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
