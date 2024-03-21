@@ -8,8 +8,16 @@ class Store extends ChangeNotifier {
   Store() {
     // Debug purpose only. Remove it once it's done.
     _accounts.addAll([
-      Account(email: 'me@example.com', name: 'Gitlab', token: 'token'),
-      Account(email: 'test@gmail.com', name: 'Github', token: 'token'),
+      Account(
+        email: 'me@example.com',
+        name: 'Github',
+        token: 'token',
+      ),
+      Account(
+        email: 'test@gmail.com',
+        name: 'Gitlab',
+        token: 'token',
+      ),
     ]);
   }
 

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:gitspace/account.dart';
+import 'package:gitspace/screens/home_screen.dart';
 import 'package:gitspace/store.dart';
 import 'package:gitspace/strings.dart';
 import 'package:http/http.dart';
@@ -125,7 +126,13 @@ class _HomeState extends State<Home> {
                     padding: const EdgeInsets.symmetric(horizontal: 32.0),
                     child: AccountCard(
                       account: account,
-                      onTap: store.select,
+                      onTap: (Account account) {
+                        store.select(account);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const HomeScreen()),
+                        );
+                      },
                       onLongPress: store.remove,
                       selected: identical(account, activeAccount),
                     ),
