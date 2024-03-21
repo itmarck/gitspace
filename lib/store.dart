@@ -1,24 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/widgets.dart';
 import 'package:gitspace/account.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Store extends ChangeNotifier {
-  final List<Account> _accounts = [];
+  final SharedPreferences _preferences;
+  List<Account> _accounts = [];
   Account? _active;
 
-  Store() {
-    // Debug purpose only. Remove it once it's done.
-    _accounts.addAll([
-      Account(
-        email: 'me@example.com',
-        name: 'Github',
-        token: 'token',
-      ),
-      Account(
-        email: 'test@gmail.com',
-        name: 'Gitlab',
-        token: 'token',
-      ),
-    ]);
+  Store({required SharedPreferences preferences}) : _preferences = preferences {
+    _accounts = _load(preferences);
   }
 
   /// List of all accounts in the user device.
@@ -44,11 +36,32 @@ class Store extends ChangeNotifier {
 
   void add(Account account) {
     _accounts.add(account);
+    _save(_accounts, _preferences);
     notifyListeners();
   }
 
   void remove(Account account) {
     _accounts.remove(account);
+    _save(_accounts, _preferences);
     notifyListeners();
   }
+}
+
+void _save(List<Account> accounts, SharedPreferences preferences) {
+  final encodedAccounts = jsonEncode(
+    accounts.map((account) => account.toMap()).toList(),
+  );
+  preferences.setString('accounts', encodedAccounts);
+}
+
+List<Account> _load(SharedPreferences preferences) {
+  final encodedAccounts = preferences.getString('accounts');
+
+  if (encodedAccounts == null) {
+    return [];
+  }
+
+  return (jsonDecode(encodedAccounts) as List).map((item) {
+    return Account.fromMap(item);
+  }).toList();
 }

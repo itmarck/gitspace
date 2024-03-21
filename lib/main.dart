@@ -7,6 +7,7 @@ import 'package:gitspace/store.dart';
 import 'package:gitspace/strings.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<Account> fetchAccount(token) async {
   final uri = Uri.parse('https://api.github.com/user/public_emails');
@@ -25,10 +26,13 @@ Future<Account> fetchAccount(token) async {
   }
 }
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final preferences = await SharedPreferences.getInstance();
+
   runApp(
     ChangeNotifierProvider<Store>(
-      create: (context) => Store(),
+      create: (context) => Store(preferences: preferences),
       child: const Gitspace(),
     ),
   );
