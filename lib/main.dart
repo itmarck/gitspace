@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:gitspace/account.dart';
+import 'package:gitspace/store.dart';
 import 'package:gitspace/strings.dart';
 import 'package:http/http.dart';
+import 'package:provider/provider.dart';
 
 Future<Account> fetchAccount(token) async {
   final uri = Uri.parse('https://api.github.com/user/public_emails');
@@ -23,7 +25,12 @@ Future<Account> fetchAccount(token) async {
 }
 
 void main() {
-  runApp(const Gitspace());
+  runApp(
+    ChangeNotifierProvider<Store>(
+      create: (context) => Store(),
+      child: const Gitspace(),
+    ),
+  );
 }
 
 class Gitspace extends StatelessWidget {
@@ -43,7 +50,7 @@ class Gitspace extends StatelessWidget {
           onPrimary: Colors.white,
           background: Color(0xFF212429),
           onBackground: Colors.white,
-          surface: Color(0xFF1C1E22),
+          surface: Color(0xFF2E3035),
           surfaceTint: Colors.transparent,
         ),
         textTheme: const TextTheme(
@@ -86,37 +93,14 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  /// List of all accounts in the user device.
-  List<Account> accounts = [
-    Account(email: 'me@example.com', name: 'Gitlab', token: 'token'),
-    Account(email: 'marcelo@gmail.com', name: 'Github', token: 'token'),
-  ];
-
-  /// Currently active account. There should be always an active account.
-  Account? activeAccount;
-
-  @override
-  void initState() {
-    super.initState();
-    activeAccount = accounts.firstOrNull;
-  }
-
-  void _selectAccount(Account account) {
-    setState(() => activeAccount = account);
-  }
-
-  void _addAccount(Account account) {
-    setState(() => accounts.add(account));
-  }
-
-  void _removeAccount(Account account) {
-    setState(() => accounts.remove(account));
-  }
-
   @override
   Widget build(BuildContext context) {
+    final store = Provider.of<Store>(context, listen: false);
+    final accounts = Provider.of<Store>(context).accounts;
+    final activeAccount = Provider.of<Store>(context).activeAccount;
+
     if (accounts.isEmpty) {
-      return AddAccountPage(onChange: _addAccount);
+      return AddAccountPage(onChange: store.add);
     }
 
     return Column(
@@ -141,8 +125,8 @@ class _HomeState extends State<Home> {
                     padding: const EdgeInsets.symmetric(horizontal: 32.0),
                     child: AccountCard(
                       account: account,
-                      onTap: _selectAccount,
-                      onLongPress: _removeAccount,
+                      onTap: store.select,
+                      onLongPress: store.remove,
                       selected: identical(account, activeAccount),
                     ),
                   ),
@@ -173,7 +157,7 @@ class _HomeState extends State<Home> {
                       bottom: MediaQuery.of(context).viewInsets.bottom,
                     ),
                     child: AddAccountPage(onChange: (Account account) {
-                      _addAccount(account);
+                      store.add(account);
                       Navigator.pop(context);
                     }),
                   );
