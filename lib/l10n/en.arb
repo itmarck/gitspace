@@ -1,11 +1,18 @@
 {
   "@@locale": "en",
+  "signIn": "Sign in",
+  "myAccounts": "My accounts",
+  "myProjects": "My projects",
   "addAccountPageTitle": "Add and account",
   "@addAccountPageTitle": {
     "description": "The main title of the add account page"
   },
-  "personalAccessToken": "Personal access token",
-  "@personalAccessToken": {
+  "addAccountHint": "Swipe up to add another account",
+  "addAccountDescription": "You can create a personal access token in your profile settings",
+  "removeAccountHint": "Long press the account to remove it",
+  "accessToken": "Personal access token",
+  "@accessToken": {
     "description": "The personal access token label"
-  }
+  },
+  "accessTokenPlaceholder": "Enter your github token"
 }

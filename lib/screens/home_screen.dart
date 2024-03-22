@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:gitspace/main.dart';
 import 'package:gitspace/repository.dart';
 import 'package:gitspace/store.dart';
@@ -43,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32.0),
               child: Text(
-                'My projects',
+                AppLocalizations.of(context)!.myProjects,
                 style: Theme.of(context).textTheme.headlineLarge,
               ),
             ),

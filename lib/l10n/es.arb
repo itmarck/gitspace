@@ -1,5 +1,12 @@
 {
   "@@locale": "es",
+  "signIn": "Acceder",
+  "myAccounts": "Mis cuentas",
+  "myProjects": "Mis proyectos",
   "addAccountPageTitle": "Agregar una cuenta",
-  "personalAccessToken": "Token de acceso personal"
+  "addAccountHint": "Desliza hacia arriba para agregar una cuenta",
+  "addAccountDescription": "Puedes crear tu token personal en la configuración de tu perfil",
+  "removeAccountHint": "Manten presionado para eliminar una cuenta",
+  "accessToken": "Token de acceso personal",
+  "accessTokenPlaceholder": "Ingresa tu token de Github"
 }

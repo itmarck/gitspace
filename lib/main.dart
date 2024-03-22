@@ -5,7 +5,6 @@ import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:gitspace/account.dart';
 import 'package:gitspace/screens/home_screen.dart';
 import 'package:gitspace/store.dart';
-import 'package:gitspace/strings.dart';
 import 'package:gitspace/theme.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
@@ -87,7 +86,7 @@ class _HomeState extends State<Home> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32.0),
           child: Text(
-            Strings.accountsPageTitle,
+            AppLocalizations.of(context)!.myAccounts,
             style: Theme.of(context).textTheme.headlineLarge,
           ),
         ),
@@ -117,7 +116,7 @@ class _HomeState extends State<Home> {
                   padding: const EdgeInsets.symmetric(horizontal: 32.0),
                   child: Center(
                     child: Text(
-                      Strings.removeAccountHint,
+                      AppLocalizations.of(context)!.removeAccountHint,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
@@ -150,10 +149,10 @@ class _HomeState extends State<Home> {
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            child: const Column(
+            child: Column(
               children: [
-                Text(Strings.addAccountHint),
-                Icon(Icons.keyboard_arrow_up_rounded, size: 48.0),
+                Text(AppLocalizations.of(context)!.addAccountHint),
+                const Icon(Icons.keyboard_arrow_up_rounded, size: 48.0),
               ],
             ),
           ),
@@ -168,7 +167,7 @@ class Confirmation extends StatelessWidget {
   final String title;
   final String description;
   final String okText;
-  final String cancelText;
+  final String? cancelText;
   final void Function()? onOk;
 
   const Confirmation({
@@ -177,8 +176,8 @@ class Confirmation extends StatelessWidget {
     required this.description,
     required this.okText,
     this.onOk,
-    cancelText,
-  }) : cancelText = cancelText ?? 'Cancel';
+    this.cancelText,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -188,7 +187,7 @@ class Confirmation extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(cancelText),
+          child: Text(cancelText ?? 'Cancel'),
         ),
         TextButton(
           onPressed: onOk,
@@ -294,15 +293,15 @@ class _AddAccountPageState extends State<AddAccountPage> {
           ),
         ),
         const SizedBox(height: 16.0),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 32.0),
-          child: Text(Strings.addAccountPageDescription),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32.0),
+          child: Text(AppLocalizations.of(context)!.addAccountDescription),
         ),
         const SizedBox(height: 64.0),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32.0),
           child: Text(
-            AppLocalizations.of(context)!.personalAccessToken,
+            AppLocalizations.of(context)!.accessToken,
             style: Theme.of(context).textTheme.labelLarge,
           ),
         ),
@@ -316,10 +315,10 @@ class _AddAccountPageState extends State<AddAccountPage> {
             ),
             child: TextField(
               controller: _textController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
-                hintText: Strings.personalAccessTokenHint,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+                hintText: AppLocalizations.of(context)!.accessTokenPlaceholder,
               ),
             ),
           ),
@@ -333,7 +332,7 @@ class _AddAccountPageState extends State<AddAccountPage> {
                 widget.onChange(account);
               });
             },
-            child: const Text(Strings.signIn),
+            child: Text(AppLocalizations.of(context)!.signIn),
           ),
         ),
         const SizedBox(height: 32.0),
