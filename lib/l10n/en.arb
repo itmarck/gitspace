@@ -1,0 +1,11 @@
+{
+  "@@locale": "en",
+  "addAccountPageTitle": "Add and account",
+  "@addAccountPageTitle": {
+    "description": "The main title of the add account page"
+  },
+  "personalAccessToken": "Personal access token",
+  "@personalAccessToken": {
+    "description": "The personal access token label"
+  }
+}

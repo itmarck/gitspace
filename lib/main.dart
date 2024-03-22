@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:gitspace/account.dart';
 import 'package:gitspace/screens/home_screen.dart';
 import 'package:gitspace/store.dart';
@@ -27,6 +28,8 @@ Future<Account> fetchAccount(token) async {
   }
 }
 
+const gitspace = 'Gitspace';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final preferences = await SharedPreferences.getInstance();
@@ -45,7 +48,9 @@ class Gitspace extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: Strings.title,
+      title: gitspace,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       themeMode: ThemeMode.dark,
       darkTheme: darkTheme,
       home: const Scaffold(
@@ -284,7 +289,7 @@ class _AddAccountPageState extends State<AddAccountPage> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32.0),
           child: Text(
-            Strings.addAccountPageTitle,
+            AppLocalizations.of(context)!.addAccountPageTitle,
             style: Theme.of(context).textTheme.headlineLarge,
           ),
         ),
@@ -297,7 +302,7 @@ class _AddAccountPageState extends State<AddAccountPage> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32.0),
           child: Text(
-            Strings.personalAccessToken,
+            AppLocalizations.of(context)!.personalAccessToken,
             style: Theme.of(context).textTheme.labelLarge,
           ),
         ),
